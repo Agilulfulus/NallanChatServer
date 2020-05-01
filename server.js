@@ -1,7 +1,9 @@
+var secret = require("./secret-url.js");
+
 var express = require("express");
 var app = express();
 var MongoClient = require("mongodb").MongoClient;
-var url = "mongodb://Nallantli:bpshpa243@157.230.208.158:27017/";
+var url = secret.url;
 
 function getMessages(db, channel, count, callback) {
 	db.collection(channel)
