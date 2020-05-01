@@ -1,5 +1,5 @@
 var MongoClient = require("mongodb").MongoClient;
-var url = "mongodb://Nallantli:bpshpa243@157.230.208.158:27017/";
+var url = require("../secret-url.js").url;
 
 MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 	if (err) throw err;

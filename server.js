@@ -1,9 +1,8 @@
-var secret = require("./secret-url.js");
+var url = require("./secret-url.js").url;
 
 var express = require("express");
 var app = express();
 var MongoClient = require("mongodb").MongoClient;
-var url = secret.url;
 
 function getMessages(db, channel, count, callback) {
 	db.collection(channel)
