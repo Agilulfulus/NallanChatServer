@@ -2,7 +2,7 @@ var url = require("./secret-url.js").url;
 
 const express = require("express");
 const app = express();
-const [MongoClient, ObjectId] = require("mongodb");
+const mongo = require("mongodb");
 
 function getMessages(db, channel, count, callback) {
 	db.collection(channel)
@@ -16,7 +16,7 @@ function getMessages(db, channel, count, callback) {
 }
 
 function getFile(db, channel, id, callback) {
-	db.collection(channel).find({ _id: ObjectId(id) })
+	db.collection(channel).find({ _id: mongo.ObjectId(id) })
 		.toArray((err, res) => {
 			if (err) throw err;
 			if (res.length > 0)
@@ -99,7 +99,7 @@ function login(dbmain, username, password, color, callback) {
 	});
 }
 
-MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
+mongo.MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 	if (err) throw err;
 
 	var dbchat = db.db("chat");
