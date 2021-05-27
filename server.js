@@ -22,7 +22,7 @@ function getFile(db, channel, id, callback) {
 			if (res.length > 0)
 				callback(JSON.parse(decodeURIComponent(res[0].content)).data);
 			else
-				callback(undefined);
+				callback(`<h2>FILE NOT FOUND</h2>`);
 		});
 }
 
