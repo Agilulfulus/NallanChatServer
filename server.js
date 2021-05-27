@@ -14,12 +14,14 @@ function getMessages(db, channel, count, callback) {
 		.toArray((err, res) => {
 			if (err) throw err;
 			let r = res.map(e => {
-				if (!cache[e.user])
+				if (!cache[e.user]) {
+					console.log(e.user);
 					promises.push(db.collection("users").findOne({ user: e.user }, (err2, u) => {
 						if (err2) throw err2;
 						console.log(u);
 						//cache[e.user] = u.color;
 					}));
+				}
 				e.content.data = undefined;
 				return e;
 			});
