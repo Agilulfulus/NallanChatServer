@@ -4,10 +4,10 @@ const express = require("express");
 const app = express();
 const mongo = require("mongodb");
 
-function getMessages(db, channel, count, callback) {
+function getMessages(dbchat, dbmain, channel, count, callback) {
 	let cache = {};
 	let promises = [];
-	db.collection(channel)
+	dbchat.collection(channel)
 		.find({})
 		.sort({ _id: -1 })
 		.limit(count)
@@ -16,8 +16,7 @@ function getMessages(db, channel, count, callback) {
 			let r = res.map(e => {
 				if (!cache[e.user.user]) {
 					cache[e.user.user] = "#ffffff";
-					promises.push(db.collection("users").find({ user: e.user.user }).toArray().then(u => {
-						console.log(e.user.user);
+					promises.push(dbmain.collection("users").find({ user: e.user.user }).toArray().then(u => {
 						if (u.length > 0)
 							cache[e.user.user] = u[0].color;
 					}, (err2) => {
@@ -33,8 +32,8 @@ function getMessages(db, channel, count, callback) {
 		});
 }
 
-function getFile(db, channel, id, callback) {
-	db.collection(channel).find({ _id: mongo.ObjectId(id) })
+function getFile(dbchat, channel, id, callback) {
+	dbchat.collection(channel).find({ _id: mongo.ObjectId(id) })
 		.toArray((err, res) => {
 			if (err) throw err;
 			if (res.length > 0)
@@ -44,21 +43,21 @@ function getFile(db, channel, id, callback) {
 		});
 }
 
-function sendMessage(db, user, channel, content, callback) {
+function sendMessage(dbchat, user, channel, content, callback) {
 	var message = {
 		user: user,
 		content: content,
 		timestamp: Date.now()
 	};
 	if (content.length == 0) if (callback) callback(message);
-	db.collection(channel).insertOne(message, err => {
+	dbchat.collection(channel).insertOne(message, err => {
 		if (err) throw err;
 		if (callback) callback(message);
 	});
 }
 
-function addUser(db, user, callback) {
-	let collection = db.collection("users");
+function addUser(dbmain, user, callback) {
+	let collection = dbmain.collection("users");
 	collection.find({ user: user.user }).toArray((err, res) => {
 		if (err) throw err;
 		if (res.length == 0) {
@@ -70,8 +69,8 @@ function addUser(db, user, callback) {
 	});
 }
 
-function userExists(db, user, callback) {
-	db.collection("users")
+function userExists(dbmain, user, callback) {
+	dbmain.collection("users")
 		.find({ user: user.user })
 		.toArray((err, res) => {
 			if (err) throw err;
@@ -152,6 +151,7 @@ mongo.MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 	app.get("/read", function (req, res) {
 		getMessages(
 			dbchat,
+			dbmain,
 			req.headers.channel,
 			parseInt(req.headers.count),
 			(colors, history) => {
