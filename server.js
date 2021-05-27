@@ -17,7 +17,7 @@ function getMessages(db, channel, count, callback) {
 
 function getFile(db, channel, id, callback) {
 	let e = db.collection(channel).find({ _id: id });
-	callback(e.content.data)
+	callback(JSON.parse(e.content).data);
 }
 
 function sendMessage(db, user, channel, content, callback) {
