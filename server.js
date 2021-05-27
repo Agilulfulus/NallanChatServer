@@ -15,6 +15,11 @@ function getMessages(db, channel, count, callback) {
 		});
 }
 
+function getFile(db, channel, id, callback) {
+	let e = db.collection(channel).find({ _id: id });
+	callback(e.content.data)
+}
+
 function sendMessage(db, user, channel, content, callback) {
 	var message = {
 		user: user,
@@ -94,7 +99,7 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 	var dbchat = db.db("chat");
 	var dbmain = db.db("main");
 
-	app.get("/", function(req, res) {
+	app.get("/", function (req, res) {
 		res.send(`
 			<body>
 				<p>
@@ -104,8 +109,7 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 		`);
 	});
 
-	app.get("/read", function(req, res) {
-		//console.log(req.headers);
+	app.get("/read", function (req, res) {
 		getMessages(
 			dbchat,
 			req.headers.channel,
@@ -116,7 +120,18 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 		);
 	});
 
-	app.get("/send", function(req, res) {
+	app.get("/file", function (req, res) {
+		getFile(
+			dbchat,
+			req.headers.channel,
+			req.query.id,
+			value => {
+				res.send(value);
+			}
+		);
+	});
+
+	app.get("/send", function (req, res) {
 		console.log(req.headers);
 		login(
 			dbmain,
@@ -137,7 +152,7 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 		);
 	});
 
-	app.listen(3000, function() {
+	app.listen(3000, function () {
 		console.log("Running NallanChat Server, port 3000");
 	});
 });
