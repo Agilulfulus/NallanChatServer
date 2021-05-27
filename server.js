@@ -24,6 +24,7 @@ function getMessages(db, channel, count, callback) {
 
 function getColor(db, username) {
 	let res = db.collection("users").findOne({ user: username });
+	console.log(res);
 	return res.color;
 }
 
