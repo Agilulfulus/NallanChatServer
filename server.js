@@ -20,7 +20,7 @@ function getFile(db, channel, id, callback) {
 		.toArray((err, res) => {
 			if (err) throw err;
 			if (res.length > 0)
-				callback(JSON.parse(decodeURIComponent(res[0].content)).data);
+				callback(res[0].content.data);
 			else
 				callback(`<h2>FILE NOT FOUND`);
 		});
@@ -121,7 +121,7 @@ mongo.MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 			req.headers.channel,
 			parseInt(req.headers.count),
 			history => {
-				res.send(history);
+				res.send(encodeURIComponent(JSON.stringify(history)));
 			}
 		);
 	});
@@ -138,18 +138,19 @@ mongo.MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 	});
 
 	app.get("/send", function (req, res) {
-		console.log(req.headers);
+		let data = JSON.parse(decodeURIComponent(req.headers.data));
+		console.log(data);
 		login(
 			dbmain,
-			req.headers.user,
-			req.headers.password,
-			req.headers.color,
+			data.user,
+			data.password,
+			data.color,
 			user => {
 				sendMessage(
 					dbchat,
 					user,
-					req.headers.channel,
-					req.headers.content,
+					data.channel,
+					data.content,
 					out => {
 						res.send(out);
 					}
