@@ -5,6 +5,7 @@ const app = express();
 const mongo = require("mongodb");
 
 function getMessages(db, channel, count, callback) {
+	let cache = {};
 	db.collection(channel)
 		.find({})
 		.sort({ _id: -1 })
@@ -12,10 +13,22 @@ function getMessages(db, channel, count, callback) {
 		.toArray((err, res) => {
 			if (err) throw err;
 			callback(res.map(e => {
+				if (!cache[e.user])
+					cache[e.user] = await getColor(db, e.user)
+				e.color = cache[e.user];
 				e.content.data = undefined;
 				return e;
 			}));
 		});
+}
+
+function getColor(db, username) {
+	return new Promise((resolve, reject) => {
+		db.collection("users").find({ user: username }).toArray((err, res) => {
+			if (err) throw err;
+			resolve(res[0].color);
+		})
+	});
 }
 
 function getFile(db, channel, id, callback) {
@@ -47,7 +60,7 @@ function addUser(db, user, callback) {
 	collection.find({ user: user.user }).toArray((err, res) => {
 		if (err) throw err;
 		if (res.length == 0) {
-			collection.insertOne({ user: user.user, password: user.password });
+			collection.insertOne({ user: user.user, password: user.password, color: user.color });
 			if (callback) callback(res);
 		} else {
 			if (callback) callback();
@@ -61,7 +74,7 @@ function userExists(db, user, callback) {
 		.toArray((err, res) => {
 			if (err) throw err;
 			if (res.length > 0) {
-				if (res[0].password == user.password) {
+				if (res[0].password === user.password) {
 					callback(0);
 				} else {
 					callback(1);
@@ -72,30 +85,45 @@ function userExists(db, user, callback) {
 		});
 }
 
-function login(dbmain, username, password, color, callback) {
+function register(dbmain, username, password, color, callback) {
+	if (!(/^#[0-9A-F]{6}$/i.test(color))) {
+		color = "#ffffff"
+	}
 	userExists(dbmain, { user: username, password: password }, res => {
-		if (!(/^#[0-9A-F]{6}$/i.test(color))) {
-			color = "#ffffff"
+		switch (res) {
+			case 0:
+			case 1:
+				console.log("User exists already: " + username);
+				callback(false);
+				break;
+			case 2:
+				addUser(dbmain, {
+					user: username,
+					password: password,
+					color: color
+				});
+				callback(true);
+				break;
 		}
+	});
+}
+
+function login(dbmain, username, password, callback) {
+	userExists(dbmain, { user: username, password: password }, res => {
 		switch (res) {
 			case 0: {
 				console.log(username + " logged in.");
-				callback({
-					user: username,
-					color: color
-				});
+				callback({ user: username });
 				break;
 			}
 			case 1: {
 				console.log("Incorrect password for user " + username);
-				callback({ user: "NULL", color: color });
+				callback({ user: "NULL" });
 				break;
 			}
 			case 2: {
-				console.log("New user " + username);
-				addUser(dbmain, { user: username, password: password }, res => {
-					callback({ user: username, color: color });
-				});
+				console.log("User does not exist: " + username);
+				callback({ user: "NULL" });
 				break;
 			}
 		}
@@ -140,6 +168,12 @@ mongo.MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 		);
 	});
 
+	app.get("/register", function (req, res) {
+		let data = JSON.parse(decodeURIComponent(req.headers.data));
+		console.log(data);
+		register(dbmain, data.user, data.password, data.color, e => res.send(e));
+	});
+
 	app.get("/send", function (req, res) {
 		let data = JSON.parse(decodeURIComponent(req.headers.data));
 		console.log(data);
@@ -147,7 +181,6 @@ mongo.MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 			dbmain,
 			data.user,
 			data.password,
-			data.color,
 			user => {
 				sendMessage(
 					dbchat,
