@@ -22,7 +22,7 @@ function getMessages(db, channel, count, callback) {
 		});
 }
 
-function getColor(db, username) {
+async function getColor(db, username) {
 	let res = await db.collection("users").find({ user: username }).toArray();
 	return res[0].color;
 }
