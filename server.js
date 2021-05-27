@@ -17,7 +17,8 @@ function getMessages(db, channel, count, callback) {
 				if (!cache[e.user])
 					promises.push(db.collection("users").findOne({ user: e.user }, (err2, u) => {
 						if (err2) throw err2;
-						cache[e.user] = u.color;
+						console.log(u);
+						//cache[e.user] = u.color;
 					}));
 				e.content.data = undefined;
 				return e;
