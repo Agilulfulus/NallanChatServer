@@ -44,6 +44,8 @@ function getFile(dbchat, channel, id, callback) {
 }
 
 function sendMessage(dbchat, user, channel, content, callback) {
+	if (!user)
+		return;
 	var message = {
 		user: user,
 		content: content,
@@ -120,12 +122,12 @@ function login(dbmain, username, password, callback) {
 			}
 			case 1: {
 				console.log("Incorrect password for user " + username);
-				callback({ user: "NULL" });
+				callback();
 				break;
 			}
 			case 2: {
 				console.log("User does not exist: " + username);
-				callback({ user: "NULL" });
+				callback();
 				break;
 			}
 		}
