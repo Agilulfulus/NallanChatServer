@@ -23,7 +23,7 @@ function getMessages(db, channel, count, callback) {
 }
 
 async function getColor(db, username) {
-	let res = await db.collection("users").find({ user: username }).toArray();
+	let res = await db.collection("users").find({ user: username }).catch(err => { throw err; });
 	return res[0].color;
 }
 
