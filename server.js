@@ -14,12 +14,11 @@ function getMessages(db, channel, count, callback) {
 		.toArray((err, res) => {
 			if (err) throw err;
 			let r = res.map(e => {
-				if (!cache[e.user]) {
-					console.log(e.user);
-					promises.push(db.collection("users").findOne({ user: e.user }, (err2, u) => {
+				if (!cache[e.user.user]) {
+					cache[e.user.user] = "#ffffff";
+					promises.push(db.collection("users").findOne({ user: e.user.user }, (err2, u) => {
 						if (err2) throw err2;
-						console.log(u);
-						//cache[e.user] = u.color;
+						cache[e.user.user] = u.color;
 					}));
 				}
 				e.content.data = undefined;
@@ -101,8 +100,9 @@ function register(dbmain, username, password, color, callback) {
 					user: username,
 					password: password,
 					color: color
-				});
-				callback(true);
+				}, () =>
+					callback(true)
+				);
 				break;
 		}
 	});
@@ -152,7 +152,7 @@ mongo.MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 			req.headers.channel,
 			parseInt(req.headers.count),
 			(colors, history) => {
-				res.send(encodeURIComponent(JSON.stringify({colors: colors, history: history})));
+				res.send(encodeURIComponent(JSON.stringify({ colors: colors, history: history })));
 			}
 		);
 	});
