@@ -19,7 +19,7 @@ function getMessages(db, channel, count, callback) {
 					promises.push(db.collection("users").findOne({ user: e.user.user }, (err2, u) => {
 						if (err2) throw err2;
 						console.log(u);
-						cache[e.user.user] = u.color;
+						//cache[e.user.user] = u.color;
 					}));
 				}
 				e.content.data = undefined;
