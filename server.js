@@ -16,11 +16,10 @@ function getMessages(db, channel, count, callback) {
 			let r = res.map(e => {
 				if (!cache[e.user.user]) {
 					cache[e.user.user] = "#ffffff";
-					console.log(e.user.user);
-					promises.push(db.collection("users").findOne({ user: e.user.user }, (err2, u) => {
+					promises.push(db.collection("users").find({ user: e.user.user }).toArray((err2, u) => {
 						if (err2) throw err2;
 						console.log(u);
-						//cache[e.user.user] = u.color;
+						cache[e.user.user] = u[0].color;
 					}));
 				}
 				e.content.data = undefined;
