@@ -3,6 +3,8 @@ var url = require("./secret-url.js").url;
 const express = require("express");
 const app = express();
 const mongo = require("mongodb");
+const multer = require('multer');
+const upload = multer();
 
 function getMessages(db, channel, count, callback) {
 	db.collection(channel)
@@ -140,8 +142,8 @@ mongo.MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 		);
 	});
 
-	app.get("/send", function (req, res) {
-		let data = JSON.parse(decodeURIComponent(req.headers.data));
+	app.get("/send", upload.none(), function (req, res) {
+		let data = req.body
 		console.log(data);
 		login(
 			dbmain,
