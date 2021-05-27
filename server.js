@@ -44,8 +44,10 @@ function getFile(dbchat, channel, id, callback) {
 }
 
 function sendMessage(dbchat, user, channel, content, callback) {
-	if (!user)
+	if (!user) {
+		callback(undefined);
 		return;
+	}
 	var message = {
 		user: user,
 		content: content,
