@@ -1,8 +1,8 @@
 var url = require("./secret-url.js").url;
 
-var express = require("express");
-var app = express();
-var MongoClient = require("mongodb").MongoClient;
+const express = require("express");
+const app = express();
+const [MongoClient, ObjectId] = require("mongodb");
 
 function getMessages(db, channel, count, callback) {
 	db.collection(channel)
@@ -22,7 +22,7 @@ function getFile(db, channel, id, callback) {
 			if (res.length > 0)
 				callback(JSON.parse(decodeURIComponent(res[0].content)).data);
 			else
-				callback(`<h2>FILE NOT FOUND</h2>`);
+				callback(`<h2>FILE NOT FOUND`);
 		});
 }
 
