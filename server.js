@@ -14,7 +14,7 @@ function getMessages(db, channel, count, callback) {
 			if (err) throw err;
 			callback(res.map(e => {
 				if (!cache[e.user])
-					cache[e.user] = getColor(db, e.user)
+					cache[e.user] = getColor(db, e.user);
 				e.color = cache[e.user];
 				e.content.data = undefined;
 				return e;
@@ -22,8 +22,8 @@ function getMessages(db, channel, count, callback) {
 		});
 }
 
-async function getColor(db, username) {
-	let res = await db.collection("users").findOne({ user: username });
+function getColor(db, username) {
+	let res = db.collection("users").findOne({ user: username });
 	return res.color;
 }
 
