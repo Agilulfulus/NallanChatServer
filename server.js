@@ -6,26 +6,29 @@ const mongo = require("mongodb");
 
 function getMessages(db, channel, count, callback) {
 	let cache = {};
+	let promises = [];
 	db.collection(channel)
 		.find({})
 		.sort({ _id: -1 })
 		.limit(count)
 		.toArray((err, res) => {
 			if (err) throw err;
-			callback(res.map(e => {
+			let r = res.map(e => {
 				if (!cache[e.user])
-					cache[e.user] = getColor(db, e.user);
-				e.color = cache[e.user];
+					promises.push(getColor(db, e.user).then(u => {
+						cache[e.user] = u.color;
+					}));
 				e.content.data = undefined;
 				return e;
-			}));
+			});
+			Promise.all(promises).then(() => {
+				callback(cache, r)
+			});
 		});
 }
 
 function getColor(db, username) {
-	let res = db.collection("users").findOne({ user: username });
-	console.log(res);
-	return res.color;
+	return db.collection("users").findOne({ user: username });
 }
 
 function getFile(db, channel, id, callback) {
@@ -148,8 +151,8 @@ mongo.MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 			dbchat,
 			req.headers.channel,
 			parseInt(req.headers.count),
-			history => {
-				res.send(encodeURIComponent(JSON.stringify(history)));
+			(colors, history) => {
+				res.send(encodeURIComponent(JSON.stringify({colors: colors, history: history})));
 			}
 		);
 	});
