@@ -16,6 +16,7 @@ function getMessages(db, channel, count, callback) {
 			let r = res.map(e => {
 				if (!cache[e.user.user]) {
 					cache[e.user.user] = "#ffffff";
+					console.log(e.user.user);
 					promises.push(db.collection("users").findOne({ user: e.user.user }, (err2, u) => {
 						if (err2) throw err2;
 						console.log(u);
