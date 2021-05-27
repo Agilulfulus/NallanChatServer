@@ -16,9 +16,14 @@ function getMessages(db, channel, count, callback) {
 }
 
 function getFile(db, channel, id, callback) {
-	let e = db.collection(channel).find({ _id: id });
-	console.log(e);
-	callback(JSON.parse(decodeURIComponent(e.content)).data);
+	db.collection(channel).find({ _id: id })
+		.toArray((err, res) => {
+			if (err) throw err;
+			if (res.length > 0)
+				callback(JSON.parse(decodeURIComponent(res[0].content)).data);
+			else
+				callback(undefined);
+		});
 }
 
 function sendMessage(db, user, channel, content, callback) {
