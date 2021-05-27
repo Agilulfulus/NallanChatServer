@@ -142,8 +142,8 @@ mongo.MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 		);
 	});
 
-	app.get("/send", upload.none(), function (req, res) {
-		let data = req.body
+	app.get("/send", upload.any(), function (req, res) {
+		let data = req.body;
 		console.log(data);
 		login(
 			dbmain,
