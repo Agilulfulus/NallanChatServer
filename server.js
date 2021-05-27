@@ -17,6 +17,7 @@ function getMessages(db, channel, count, callback) {
 				if (!cache[e.user.user]) {
 					cache[e.user.user] = "#ffffff";
 					promises.push(db.collection("users").find({ user: e.user.user }).toArray().then(u => {
+						console.log(e.user.user);
 						if (u.length > 0)
 							cache[e.user.user] = u[0].color;
 					}, (err2) => {
@@ -27,7 +28,6 @@ function getMessages(db, channel, count, callback) {
 				return e;
 			});
 			Promise.all(promises).then(() => {
-				console.log(promises);
 				callback(cache, r)
 			});
 		});
