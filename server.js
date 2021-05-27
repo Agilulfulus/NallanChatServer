@@ -15,7 +15,8 @@ function getMessages(db, channel, count, callback) {
 			if (err) throw err;
 			let r = res.map(e => {
 				if (!cache[e.user])
-					promises.push(getColor(db, e.user).then(u => {
+					promises.push(db.collection("users").findOne({ user: e.user }, (err2, u) => {
+						if (err2) throw err2;
 						cache[e.user] = u.color;
 					}));
 				e.content.data = undefined;
@@ -25,10 +26,6 @@ function getMessages(db, channel, count, callback) {
 				callback(cache, r)
 			});
 		});
-}
-
-function getColor(db, username) {
-	return db.collection("users").findOne({ user: username });
 }
 
 function getFile(db, channel, id, callback) {
