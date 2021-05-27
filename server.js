@@ -26,8 +26,8 @@ function getMessages(db, channel, count, callback) {
 				e.content.data = undefined;
 				return e;
 			});
-			console.log(promises);
 			Promise.all(promises).then(() => {
+				console.log(promises);
 				callback(cache, r)
 			});
 		});
