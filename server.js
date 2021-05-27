@@ -11,7 +11,10 @@ function getMessages(db, channel, count, callback) {
 		.limit(count)
 		.toArray((err, res) => {
 			if (err) throw err;
-			callback(res.map(e => e.content.data = undefined));
+			callback(res.map(e => {
+				e.content.data = undefined;
+				return e;
+			}));
 		});
 }
 
