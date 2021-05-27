@@ -4,7 +4,7 @@ const express = require("express");
 const app = express();
 const mongo = require("mongodb");
 
-async function getMessages(db, channel, count, callback) {
+function getMessages(db, channel, count, callback) {
 	let cache = {};
 	db.collection(channel)
 		.find({})
@@ -14,7 +14,7 @@ async function getMessages(db, channel, count, callback) {
 			if (err) throw err;
 			callback(res.map(e => {
 				if (!cache[e.user])
-					cache[e.user] = await getColor(db, e.user)
+					cache[e.user] = getColor(db, e.user)
 				e.color = cache[e.user];
 				e.content.data = undefined;
 				return e;
@@ -23,12 +23,8 @@ async function getMessages(db, channel, count, callback) {
 }
 
 function getColor(db, username) {
-	return new Promise((resolve, reject) => {
-		db.collection("users").find({ user: username }).toArray((err, res) => {
-			if (err) throw err;
-			resolve(res[0].color);
-		})
-	});
+	let res = await db.collection("users").find({ user: username }).toArray();
+	return res[0].color;
 }
 
 function getFile(db, channel, id, callback) {
