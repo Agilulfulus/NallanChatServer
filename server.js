@@ -4,7 +4,7 @@ const express = require("express");
 const app = express();
 const mongo = require("mongodb");
 
-function getMessages(db, channel, count, callback) {
+async function getMessages(db, channel, count, callback) {
 	let cache = {};
 	db.collection(channel)
 		.find({})
