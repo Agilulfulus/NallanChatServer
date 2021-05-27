@@ -16,7 +16,7 @@ function getMessages(db, channel, count, callback) {
 }
 
 function getFile(db, channel, id, callback) {
-	db.collection(channel).find({ _id: id })
+	db.collection(channel).find({ _id: ObjectId(id) })
 		.toArray((err, res) => {
 			if (err) throw err;
 			if (res.length > 0)
