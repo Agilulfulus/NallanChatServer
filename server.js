@@ -34,7 +34,7 @@ function sendMessage(db, user, channel, content, callback) {
 }
 
 function addUser(db, user, callback) {
-	collection = db.collection("users");
+	let collection = db.collection("users");
 	collection.find({ user: user.user }).toArray((err, res) => {
 		if (err) throw err;
 		if (res.length == 0) {
@@ -123,7 +123,7 @@ MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 	app.get("/file", function (req, res) {
 		getFile(
 			dbchat,
-			req.headers.channel,
+			req.query.channel,
 			req.query.id,
 			value => {
 				res.send(value);
