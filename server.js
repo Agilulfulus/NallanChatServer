@@ -18,8 +18,8 @@ function getMessages(db, channel, count, callback) {
 					cache[e.user.user] = "#ffffff";
 					promises.push(db.collection("users").find({ user: e.user.user }).toArray((err2, u) => {
 						if (err2) throw err2;
-						console.log(u);
-						cache[e.user.user] = u[0].color;
+						if (u.length > 0)
+							cache[e.user.user] = u[0].color;
 					}));
 				}
 				e.content.data = undefined;
