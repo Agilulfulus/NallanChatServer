@@ -24,7 +24,7 @@ function getMessages(db, channel, count, callback) {
 
 async function getColor(db, username) {
 	let res = await db.collection("users").find({ user: username }).catch(err => { throw err; });
-	return res[0].color;
+	return res.toArray()[0].color;
 }
 
 function getFile(db, channel, id, callback) {
