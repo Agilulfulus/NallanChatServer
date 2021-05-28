@@ -187,7 +187,7 @@ mongo.MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 		login(
 			dbmain,
 			data.user,
-			data.password,
+			data.user.password,
 			user => {
 				sendMessage(
 					dbchat,
