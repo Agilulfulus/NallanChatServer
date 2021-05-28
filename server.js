@@ -114,11 +114,6 @@ function register(dbmain, username, password, color, callback) {
 function login(dbmain, username, password, callback) {
 	userExists(dbmain, { user: username, password: password }, res => {
 		switch (res) {
-			case 0: {
-				console.log(username + " logged in.");
-				callback(res);
-				break;
-			}
 			case 1: {
 				console.log("Incorrect password for user " + username);
 				callback();
@@ -127,6 +122,11 @@ function login(dbmain, username, password, callback) {
 			case 2: {
 				console.log("User does not exist: " + username);
 				callback();
+				break;
+			}
+			default: {
+				console.log(username + " logged in.");
+				callback(res);
 				break;
 			}
 		}
