@@ -80,7 +80,7 @@ function userExists(dbmain, user, callback) {
 			if (err) throw err;
 			if (res.length > 0) {
 				if (res[0].password === user.password) {
-					callback(0);
+					callback(res[0]);
 				} else {
 					callback(1);
 				}
@@ -96,19 +96,16 @@ function register(dbmain, username, password, color, callback) {
 	}
 	userExists(dbmain, { user: username, password: password }, res => {
 		switch (res) {
-			case 0:
-			case 1:
-				console.log("User exists already: " + username);
-				callback(false);
-				break;
 			case 2:
 				addUser(dbmain, {
 					user: username,
 					password: password,
 					color: color
-				}, () =>
-					callback(true)
-				);
+				}, () => callback(true));
+				break;
+			default:
+				console.log("User exists already: " + username);
+				callback(false);
 				break;
 		}
 	});
@@ -119,7 +116,7 @@ function login(dbmain, username, password, callback) {
 		switch (res) {
 			case 0: {
 				console.log(username + " logged in.");
-				callback({ user: username });
+				callback(res);
 				break;
 			}
 			case 1: {
@@ -186,7 +183,7 @@ mongo.MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 		console.log(data);
 		login(
 			dbmain,
-			data.user,
+			data.user.user,
 			data.user.password,
 			user => {
 				sendMessage(
